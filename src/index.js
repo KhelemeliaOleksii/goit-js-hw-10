@@ -10,9 +10,6 @@ import {_} from 'lodash';
 
 const DEBOUNCE_DELAY = 300;
 
-
-
-console.log("Hello");
 const refs = {
     inputCountry: document.querySelector("#search-box"),
     info: document.querySelector('.country-info'),
@@ -55,32 +52,38 @@ const refs = {
             if (this.isActiveBefore) {
                 this.clearFields();
                 this.isActiveBefore = false;
-                Notiflix.Notify.info("Too many matches found. Please enter a more specific name.");
-                return;
             }
+            Notiflix.Notify.info("Too many matches found. Please enter a more specific name.");
+            console.log("amount: ",amount);
+            return;
+
         }
         if (amount === 0) {
             if (this.isActiveBefore) {
                 this.clearFields();
                 this.isActiveBefore = false;
-                Notiflix.Notify.failure("Oops, there is no country with that name");
-                return;
             }
-        }
+            Notiflix.Notify.failure("Oops, there is no country with that name");
+            console.log("amount: ",amount);
+            return;
+    }
         if (amount < 0) {
             this.isActiveBefore = false;
             Notiflix.Notify.failure("Error");
+            console.log("amount: ",amount);
             return;
         }
         if (amount === 1) {
             this.isActiveBefore = true;
             this.list.innerHTML = this.createList(dataArray);
             this.info.innerHTML = this.createInfo(dataArray[0]);
+            console.log("amount: ",amount);
             return;
         }
         this.isActiveBefore = true;
         this.list.innerHTML = this.createList(dataArray);
         this.info.innerHTML = "";
+        console.log("amount: ",amount);
         return;
 
     },
@@ -107,21 +110,13 @@ const refs = {
 
 // const inputCountry = document.querySelector("#search-box");
 // const info = document.querySelector('.country-info');
-refs.inputCountry.addEventListener('input', inputListener);
+refs.inputCountry.addEventListener('input', _.debounce(inputListener, DEBOUNCE_DELAY));
 
 //console.log(refs);
 function inputListener(event) {
-    _.debounce(() => {
-//   requestApi(inputText)
-//         .then((data) => {
-//             //console.log(data);
-//             console.log("In");
-//             refs.addIntoHTML(data);
-//         })
-//         .catch(error => console.log(error));
-        console.log("In");
-    }, DEBOUNCE_DELAY,
-    );
+    request();
+}
+function request () {
     const inputText = refs.inputCountry.value;
     const isValidValue = refs.verifyCountryNameOnEnglish(inputText);
     if (!isValidValue) {
